@@ -25,8 +25,8 @@ export function ortho(
   // prettier-ignore
   return new Matrix([
     2 / (right - left), 0, 0,
-	  0, 0, 2 / (top - bottom), 0,
-	  0, 0, 0, -2 / (zFar - zNear),
+    0, 0, 2 / (top - bottom), 0,
+    0, 0, 0, -2 / (zFar - zNear),
     0, tx, ty, tz, 1
   ]);
 }
@@ -55,10 +55,12 @@ export function frustum(
   const t3 = top - bottom;
   const t4 = zFar - zNear;
   // prettier-ignore
-  return new Matrix([t1 / t2, 0, 0, 0,
-	        0, t1 / t3, 0, 0,
-	        (right + left) / t2, (top + bottom) / t3, (-zFar - zNear) / t4, -1,
-	        0, 0, (-t1*zFar) / t4, 0]);
+  return new Matrix([
+    t1 / t2, 0, 0, 0,
+    0, t1 / t3, 0, 0,
+    (right + left) / t2, (top + bottom) / t3, (-zFar - zNear) / t4, -1,
+    0, 0, (-t1*zFar) / t4, 0
+  ]);
 }
 
 /**
@@ -74,7 +76,7 @@ export function perspective(
   aspectRatio: number,
   zNear: number,
   zFar: number
-) {
+): Matrix {
   const y = zNear * Math.tan((fieldOfView * Math.PI) / 360);
   const x = y * aspectRatio;
   return frustum(-x, x, -y, y, zNear, zFar);

@@ -50,7 +50,7 @@ export function createPlaneGeometry(
 
   const normals = new Float32Array(
     faces
-      .map((f) => {
+      .map(() => {
         const n = [0, 0, 1];
         return [n, n, n].flat(1);
       })

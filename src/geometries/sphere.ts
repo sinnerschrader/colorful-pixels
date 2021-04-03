@@ -8,7 +8,11 @@ import { BufferAttribute, BufferGeometry } from './buffer-geometry';
  * @param sides number of sides (around the sphere)
  * @param segments number of segments (from top to bottom)
  */
-export function createSphereGeometry(r = 0.5, sides = 36, segments = 18) {
+export function createSphereGeometry(
+  r = 0.5,
+  sides = 36,
+  segments = 18
+): BufferGeometry {
   const vertices: Vector[] = [];
   const normals: Vector[] = [];
   const texCoords = [];

@@ -115,7 +115,7 @@ function wrapUniforms(
     get(target: Uniforms, prop: string) {
       return target[prop];
     },
-    set(target: Uniforms, prop: string, value: any): boolean {
+    set(target: Uniforms, prop: string, value: Uniform): boolean {
       target[prop] = value;
       return setUniform(gl, program, prop, value as Uniform);
     },
@@ -219,29 +219,32 @@ export class WebGLObject {
     return buffers;
   }
 
-  recompile() {
+  recompile(): WebGLObject {
     const { vertexShader, fragmentShader } = this;
     this.program = this.createProgram(vertexShader, fragmentShader);
+    return this;
   }
 
-  setUniforms() {
+  setUniforms(): WebGLObject {
     const { gl, program } = this;
     gl.useProgram(program);
     for (const [name, value] of Object.entries(this.uniforms)) {
       setUniform(gl, program, name, value);
     }
+    return this;
   }
 
-  disableAttribs() {
+  disableAttribs(): WebGLObject {
     const { gl, program, buffers } = this;
     gl.useProgram(program);
     for (const key of Object.keys(buffers)) {
       const loc = gl.getAttribLocation(program, key);
       gl.disableVertexAttribArray(loc);
     }
+    return this;
   }
 
-  enableAttribs() {
+  enableAttribs(): WebGLObject {
     const { gl, program, buffers, geometry } = this;
     gl.useProgram(program);
     for (const [key, buffer] of Object.entries(buffers)) {
@@ -251,13 +254,15 @@ export class WebGLObject {
       gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
       gl.vertexAttribPointer(loc, attribute.recordSize, gl.FLOAT, false, 0, 0);
     }
+    return this;
   }
 
-  draw() {
+  draw(): WebGLObject {
     this.gl.drawArrays(this.drawMode, 0, this.geometry.count);
+    return this;
   }
 
-  dispose() {
+  dispose(): void {
     const { gl, program } = this;
     for (const [key, buffer] of Object.entries(this.buffers)) {
       const loc = gl.getAttribLocation(program, key);

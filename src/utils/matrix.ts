@@ -28,7 +28,7 @@ export class Matrix {
    * create identity matrix
    * @param dimension dimension of the matrix
    */
-  static identity(dimension: number) {
+  static identity(dimension: number): Matrix {
     if (dimension <= 0 || !Number.isInteger(dimension)) {
       throw Error('ArgumentError');
     }
@@ -76,7 +76,7 @@ export class Matrix {
   /**
    * convert to array
    */
-  toArray() {
+  toArray(): number[] {
     return this.values;
   }
 
@@ -85,7 +85,7 @@ export class Matrix {
    * @param row row index starting from 0
    * @param column column index starting from 0
    */
-  valueAt(row: number, column: number) {
+  valueAt(row: number, column: number): number {
     return this.values[column * this.numRows + row];
   }
 
@@ -94,7 +94,7 @@ export class Matrix {
    * @param column index of column starting from 0
    * @returns column as an array of numbers
    */
-  colAt(column: number) {
+  colAt(column: number): number[] {
     const { numRows } = this;
     return this.values.slice(column * numRows, column * numRows + numRows);
   }
@@ -104,7 +104,7 @@ export class Matrix {
    * @param row index of row starting from 0
    * @returns row as an array of numbers
    */
-  rowAt(row: number) {
+  rowAt(row: number): number[] {
     const { numRows, numCols } = this;
     return Array(numCols)
       .fill(0)
@@ -114,7 +114,7 @@ export class Matrix {
   /**
    * returns transposed matrix
    */
-  transpose() {
+  transpose(): Matrix {
     const transposedValues: number[] = [];
     Array(this.numRows)
       .fill(0)
@@ -132,7 +132,7 @@ export class Matrix {
    * @param otherMatrix matrix to compare
    * @returns true or false
    */
-  equals(otherMatrix: Matrix) {
+  equals(otherMatrix: Matrix): boolean {
     if (
       this.values.length !== otherMatrix.values.length ||
       this.numCols !== otherMatrix.numCols ||
@@ -154,7 +154,7 @@ export class Matrix {
    * @param delta tolerance, by default 1e-14
    * @returns true or false
    */
-  roughlyEquals(otherMatrix: Matrix, delta = 1e-14) {
+  roughlyEquals(otherMatrix: Matrix, delta = 1e-14): boolean {
     if (
       this.values.length !== otherMatrix.values.length ||
       this.numCols !== otherMatrix.numCols ||
@@ -175,7 +175,7 @@ export class Matrix {
    * @param otherMatrix matrix to add
    * @returns result matrix
    */
-  add(otherMatrix: Matrix) {
+  add(otherMatrix: Matrix): Matrix {
     if (
       this.numCols === otherMatrix.numCols &&
       this.numRows === otherMatrix.numRows &&
@@ -197,7 +197,7 @@ export class Matrix {
    * @param otherMatrix matrix to subtract
    * @returns result matrix
    */
-  sub(otherMatrix: Matrix) {
+  sub(otherMatrix: Matrix): Matrix {
     if (
       this.numCols === otherMatrix.numCols &&
       this.numRows === otherMatrix.numRows &&
@@ -276,7 +276,7 @@ export class Matrix {
   /**
    * calculate determinant, implemented for mat2, mat3, mat4
    */
-  determinant() {
+  determinant(): number {
     const { numRows, numCols } = this;
 
     // glsl uses column major notation
@@ -345,7 +345,7 @@ export class Matrix {
   /**
    * calculate M^-1 for mat2, mat3, mat4
    */
-  inverse() {
+  inverse(): Matrix {
     const { numRows, numCols } = this;
     if (numRows !== numCols) {
       throw Error('ArgumentError');
@@ -479,7 +479,7 @@ export class Matrix {
    * convert matrix to string
    * @returns a string containing matROWSxCOLS(comma-separated-values)
    */
-  toString() {
+  toString(): string {
     const { numRows, numCols, values } = this;
     return `mat${numRows}x${numCols}(${values.join(', ')})`;
   }
@@ -589,8 +589,8 @@ export const Mat3 = {
     // prettier-ignore
     return new Matrix([
       C, S, 0,
-	   -S, C, 0,
-	    0, 0, 1
+     -S, C, 0,
+      0, 0, 1
     ]);
   },
 };
@@ -599,7 +599,7 @@ export const Mat4 = {
   /**
    * create 4x4 identity matrix
    */
-  identity() {
+  identity(): Matrix {
     // prettier-ignore
     return new Matrix([
       1, 0, 0, 0,
@@ -686,9 +686,9 @@ export const Mat4 = {
     // prettier-ignore
     return new Matrix([
       C, S, 0, 0,
-	   -S, C, 0, 0,
-	    0, 0, 1, 0,
-	    0, 0, 0, 1
+     -S, C, 0, 0,
+      0, 0, 1, 0,
+      0, 0, 0, 1
     ]);
   },
 };
