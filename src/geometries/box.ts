@@ -43,34 +43,35 @@ export function createBoxGeometry(
   ];
   //prettier-ignore
   const uvMapping: number[] = [
-    0, 1, 2, 2, 1, 3,
-    1, 0, 3, 3, 0, 2,
-    1, 0, 3, 3, 0, 2,
-    2, 0, 1, 1, 2, 3,
-    1, 0, 3, 3, 0, 2,
-    0, 1, 2, 2, 1, 3
+    0, 2, 1, 2, 3, 1,
+    1, 0, 3, 3, 2, 0,
+    1, 3, 0, 3, 2, 0,
+    2, 0, 1, 1, 3, 2,
+    1, 3, 0, 3, 2, 0,
+    0, 2, 1, 2, 3, 1
   ].map((face: number) => uvs[face]).flat();
 
   const faces: number[][] = [
     // back
-    [0, 1, 2],
-    [2, 1, 3],
+    [0, 2, 1],
+    [2, 3, 1],
     // front
-    [5, 4, 7],
-    [7, 4, 6],
+    [5, 7, 4],
+    [7, 6, 4],
     // left
-    [4, 0, 6],
-    [6, 0, 2],
+    [4, 6, 0],
+    [6, 2, 0],
     // right
     [7, 5, 1],
-    [1, 7, 3],
+    [1, 3, 7],
     // top
-    [1, 0, 5],
-    [5, 0, 4],
+    [1, 5, 0],
+    [5, 4, 0],
     // bottom
-    [2, 3, 6],
-    [6, 3, 7],
+    [2, 6, 3],
+    [6, 7, 3],
   ];
+
   const normals = faces.map((f) =>
     calculateSurfaceNormal(vertices[f[0]], vertices[f[1]], vertices[f[2]])
   );
