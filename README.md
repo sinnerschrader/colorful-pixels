@@ -11,7 +11,8 @@ This is actually a project by [Lea](https://github.com/terabaud), and she decide
 
 - `Vector`, `Matrix` classes
 - a `Renderer` which renders `WebGLObject`s
-- a `WebGLObject` contains a geometry, uniforms, vertex and fragment shaders
+- a `WebGLObject` contains a `BufferGeometry`, uniform variables, vertex and fragment shaders
+- the `BufferGeometry` API is similar to in three.js
 - Helpers for creating orthographic, perspective projection matrices
 - A `Stopwatch` class for timing (like `performance.now()` but with the possibility to start/stop)
 - One-Liners (`mix`, `clamp`)
