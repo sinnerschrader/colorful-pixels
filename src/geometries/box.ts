@@ -122,7 +122,7 @@ function buildPlane(
 }
 
 /**
- *
+ * Create a box geometry
  * @param width width of the box (default: 1)
  * @param height height of the box (default: 1)
  * @param depth depth of the box (default: 1)
