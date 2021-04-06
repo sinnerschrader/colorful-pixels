@@ -216,6 +216,23 @@ export class WebGLObject {
       );
       buffers[name] = buffer;
     }
+    if (geometry.index) {
+      const indexBuffer = gl.createBuffer();
+      if (indexBuffer === null) {
+        throw Error(ERRORS.WEBGL_ERROR);
+      }
+      // make this buffer the current 'ELEMENT_ARRAY_BUFFER'
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+      let data = null;
+      if (geometry.indexType === 16) {
+        data = new Uint16Array(geometry.index);
+      }
+      if (geometry.indexType === 32) {
+        data = new Uint32Array(geometry.index);
+      }
+      gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, data, gl.STATIC_DRAW);
+      buffers['_index'] = indexBuffer;
+    }
     return buffers;
   }
 
@@ -258,6 +275,17 @@ export class WebGLObject {
   }
 
   draw(): WebGLObject {
+    if (this.geometry.index !== null) {
+      let indexType = WebGLRenderingContext.NONE;
+      if (this.geometry.indexType === 16) {
+        indexType = WebGLRenderingContext.UNSIGNED_SHORT;
+      }
+      if (this.geometry.indexType === 32) {
+        indexType = WebGLRenderingContext.UNSIGNED_INT;
+      }
+      this.gl.drawElements(this.drawMode, this.geometry.count, indexType, 0);
+      return this;
+    }
     this.gl.drawArrays(this.drawMode, 0, this.geometry.count);
     return this;
   }
@@ -265,8 +293,10 @@ export class WebGLObject {
   dispose(): void {
     const { gl, program } = this;
     for (const [key, buffer] of Object.entries(this.buffers)) {
-      const loc = gl.getAttribLocation(program, key);
-      gl.disableVertexAttribArray(loc);
+      if (!key.startsWith('_')) {
+        const loc = gl.getAttribLocation(program, key);
+        gl.disableVertexAttribArray(loc);
+      }
       gl.deleteBuffer(buffer);
     }
     gl.deleteProgram(program);
