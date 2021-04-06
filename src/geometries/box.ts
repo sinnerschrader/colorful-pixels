@@ -123,12 +123,12 @@ function buildPlane(
 
 /**
  *
- * @param width width of the box
- * @param height height of the box
- * @param depth depth of the box
- * @param widthSegments number of width segments
- * @param heightSegments number of height segments
- * @param depthSegments number of depth segments
+ * @param width width of the box (default: 1)
+ * @param height height of the box (default: 1)
+ * @param depth depth of the box (default: 1)
+ * @param widthSegments number of width segments (default: 1)
+ * @param heightSegments number of height segments (default: 1)
+ * @param depthSegments number of depth segments (default: 1)
  * @returns a buffer geometry
  */
 export function createBoxGeometry(
