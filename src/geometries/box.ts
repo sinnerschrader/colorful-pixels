@@ -1,90 +1,294 @@
 import { BufferAttribute, BufferGeometry } from './buffer-geometry';
-import { calculateSurfaceNormal, facesToBuffer, Vector } from './../utils';
 
 /**
- * Create a box geometry with the sizes a * b * c,
- * centered at (0, 0, 0), 2 triangles per side.
- * TODO: implement subdivisions
+ * Build a plane
  *
- * @name box
- * @param {number} sizeA
- * @param {number} sizeB
- * @param {number} sizeC
+ * @param u first axis
+ * @param v second axis
+ * @param w third axis
+ * @param udir u-direction
+ * @param vdir v-direction
+ * @param width width
+ * @param height height
+ * @param depth depth
+ * @param gridX number of segments in x-direction
+ * @param gridY number of segments in y-direction
+ * @param vertexIndexStart starting vertex index
+ * @param faceIndex face index
+ * @returns
+ */
+function buildPlane(
+  u: string,
+  v: string,
+  w: string,
+  udir: number,
+  vdir: number,
+  width: number,
+  height: number,
+  depth: number,
+  gridX: number,
+  gridY: number,
+  vertexIndexStart: number,
+  faceIndex: number
+) {
+  const segmentWidth = width / gridX;
+  const segmentHeight = height / gridY;
+
+  const widthHalf = width / 2;
+  const heightHalf = height / 2;
+  const depthHalf = depth / 2;
+
+  const gridX1 = gridX + 1;
+  const gridY1 = gridY + 1;
+
+  let vertexCount = 0;
+  let groupCount = 0;
+
+  const vector: Record<string, number> = { x: NaN, y: NaN, z: NaN };
+  const vertices: number[] = [];
+  const normals: number[] = [];
+  const uvs: number[] = [];
+  const indices: number[] = [];
+  const faceIndices: number[] = [];
+
+  // generate vertices, normals and uvs
+  for (let iy = 0; iy < gridY1; iy++) {
+    const y = iy * segmentHeight - heightHalf;
+
+    for (let ix = 0; ix < gridX1; ix++) {
+      const x = ix * segmentWidth - widthHalf;
+
+      // set values to correct vector component
+      vector[u] = x * udir;
+      vector[v] = y * vdir;
+      vector[w] = depthHalf;
+
+      // now apply vector to vertex buffer
+      vertices.push(vector.x, vector.y, vector.z);
+
+      // set values to correct vector component
+      vector[u] = 0;
+      vector[v] = 0;
+      vector[w] = depth > 0 ? 1 : -1;
+
+      // now apply vector to normal buffer
+      normals.push(vector.x, vector.y, vector.z);
+
+      // uvs
+      uvs.push(ix / gridX);
+      uvs.push(1 - iy / gridY);
+
+      // faceIndices
+      faceIndices.push(faceIndex);
+
+      // counters
+      vertexCount += 1;
+    }
+  }
+
+  // indices
+
+  // 1. you need three indices to draw a single face
+  // 2. a single segment consists of two faces
+  // 3. so we need to generate six (2*3) indices per segment
+
+  for (let iy = 0; iy < gridY; iy++) {
+    for (let ix = 0; ix < gridX; ix++) {
+      const a = vertexIndexStart + ix + gridX1 * iy;
+      const b = vertexIndexStart + ix + gridX1 * (iy + 1);
+      const c = vertexIndexStart + (ix + 1) + gridX1 * (iy + 1);
+      const d = vertexIndexStart + (ix + 1) + gridX1 * iy;
+
+      // faces
+      indices.push(a, b, d);
+      indices.push(b, c, d);
+
+      // increase counter
+      groupCount += 6;
+    }
+  }
+
+  // update total number of vertices
+  vertexIndexStart += vertexCount;
+  return {
+    vertices,
+    normals,
+    uvs,
+    indices,
+    faceIndices,
+    groupCount,
+    vertexCount,
+  };
+}
+
+/**
+ *
+ * @param width width of the box
+ * @param height height of the box
+ * @param depth depth of the box
+ * @param widthSegments number of width segments
+ * @param heightSegments number of height segments
+ * @param depthSegments number of depth segments
+ * @returns a buffer geometry
  */
 export function createBoxGeometry(
-  sizeA = 1.0,
-  sizeB = 1.0,
-  sizeC = 1.0
-): BufferGeometry {
-  const a = sizeA * 0.5;
-  const b = sizeB * 0.5;
-  const c = sizeC * 0.5;
-  const vertices = [
-    [-a, -b, -c],
-    [a, -b, -c],
-    [-a, b, -c],
-    [a, b, -c],
-    [-a, -b, c],
-    [a, -b, c],
-    [-a, b, c],
-    [a, b, c],
-  ].map((v) => new Vector(...v));
-  //     0______1
-  //   4/|____5/|
-  //   |2|____|_|3
-  //   |/ ____|/
-  //  6       7
+  width = 1,
+  height = 1,
+  depth = 1,
+  widthSegments = 1,
+  heightSegments = 1,
+  depthSegments = 1
+) {
+  // build each side of the box geometry
+  let count = 0;
 
-  const uvs = [
-    [0, 0],
-    [1, 0],
-    [0, 1],
-    [1, 1],
-  ];
-  //prettier-ignore
-  const uvMapping: number[] = [
-    0, 2, 1, 2, 3, 1,
-    1, 0, 3, 3, 2, 0,
-    1, 3, 0, 3, 2, 0,
-    2, 0, 1, 1, 3, 2,
-    1, 3, 0, 3, 2, 0,
-    0, 2, 1, 2, 3, 1
-  ].map((face: number) => uvs[face]).flat();
-
-  const faces: number[][] = [
-    // back
-    [0, 2, 1],
-    [2, 3, 1],
-    // front
-    [5, 7, 4],
-    [7, 6, 4],
-    // left
-    [4, 6, 0],
-    [6, 2, 0],
-    // right
-    [7, 5, 1],
-    [1, 3, 7],
-    // top
-    [1, 5, 0],
-    [5, 4, 0],
-    // bottom
-    [2, 6, 3],
-    [6, 7, 3],
-  ];
-
-  const normals = faces.map((f) =>
-    calculateSurfaceNormal(vertices[f[0]], vertices[f[1]], vertices[f[2]])
+  const px = buildPlane(
+    'z',
+    'y',
+    'x',
+    -1,
+    -1,
+    depth,
+    height,
+    width,
+    depthSegments,
+    heightSegments,
+    count,
+    0
   );
-  const positionData = new Float32Array(facesToBuffer(faces, vertices));
-  const uvData = new Float32Array(uvMapping);
-  const normalData = new Float32Array(
-    Array.from({ length: normals.length * 3 })
-      .map((_, idx) => normals[(idx / 3) | 0].toArray())
-      .flat()
+  count += px.vertexCount;
+
+  const nx = buildPlane(
+    'z',
+    'y',
+    'x',
+    1,
+    -1,
+    depth,
+    height,
+    -width,
+    depthSegments,
+    heightSegments,
+    count,
+    1
   );
+  count += nx.vertexCount;
+
+  const py = buildPlane(
+    'x',
+    'z',
+    'y',
+    1,
+    1,
+    width,
+    depth,
+    height,
+    widthSegments,
+    depthSegments,
+    count,
+    2
+  );
+  count += py.vertexCount;
+
+  const ny = buildPlane(
+    'x',
+    'z',
+    'y',
+    1,
+    -1,
+    width,
+    depth,
+    -height,
+    widthSegments,
+    depthSegments,
+    count,
+    3
+  );
+  count += ny.vertexCount;
+
+  const pz = buildPlane(
+    'x',
+    'y',
+    'z',
+    1,
+    -1,
+    width,
+    height,
+    depth,
+    widthSegments,
+    heightSegments,
+    count,
+    4
+  );
+  count += pz.vertexCount;
+
+  const nz = buildPlane(
+    'x',
+    'y',
+    'z',
+    -1,
+    -1,
+    width,
+    height,
+    -depth,
+    widthSegments,
+    heightSegments,
+    count,
+    5
+  );
+  count += nz.vertexCount;
+
+  const vertices = new Float32Array(
+    Array.prototype.concat.apply(
+      [],
+      [
+        px.vertices,
+        nx.vertices,
+        py.vertices,
+        ny.vertices,
+        pz.vertices,
+        nz.vertices,
+      ]
+    )
+  );
+
+  const normals = new Float32Array(
+    Array.prototype.concat.apply(
+      [],
+      [px.normals, nx.normals, py.normals, ny.normals, pz.normals, nz.normals]
+    )
+  );
+
+  const uvs = new Float32Array(
+    Array.prototype.concat.apply(
+      [],
+      [px.uvs, nx.uvs, py.uvs, ny.uvs, pz.uvs, nz.uvs]
+    )
+  );
+
+  const indices = Array.prototype.concat.apply(
+    [],
+    [px.indices, nx.indices, py.indices, pz.indices]
+  );
+  const faceIndices = new Float32Array(
+    Array.prototype.concat.apply(
+      [],
+      [
+        px.faceIndices,
+        nx.faceIndices,
+        py.faceIndices,
+        ny.faceIndices,
+        pz.faceIndices,
+        nz.faceIndices,
+      ]
+    )
+  );
+
   const geometry = new BufferGeometry();
-  geometry.setAttribute('position', new BufferAttribute(positionData, 3));
-  geometry.setAttribute('uv', new BufferAttribute(uvData, 2));
-  geometry.setAttribute('normal', new BufferAttribute(normalData, 3));
+  geometry.setAttribute('position', new BufferAttribute(vertices, 3));
+  geometry.setAttribute('normal', new BufferAttribute(normals, 3));
+  geometry.setAttribute('uv', new BufferAttribute(uvs, 2));
+  geometry.setAttribute('faceIndex', new BufferAttribute(faceIndices, 1));
+  geometry.setIndex(indices);
   return geometry;
 }
