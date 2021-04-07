@@ -1,0 +1,21 @@
+# This workflow will do a clean install of node dependencies, run tests and build the source code
+
+name: Run a build
+
+on: pull_request
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+      with:
+        node-version: 14
+    - run: |
+        npm ci
+        npm run lint
+        npm test
+        npm build
