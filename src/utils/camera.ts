@@ -1,4 +1,4 @@
-import { Vector, Mat4, Matrix } from '.';
+import { Vector, Mat4 } from '.';
 
 export class Camera {
   position: Vector = new Vector(0, 0, 5);

@@ -138,7 +138,7 @@ export function createBoxGeometry(
   widthSegments = 1,
   heightSegments = 1,
   depthSegments = 1
-) {
+): BufferGeometry {
   // build each side of the box geometry
   let count = 0;
 
