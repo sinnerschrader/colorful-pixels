@@ -8,17 +8,37 @@ export class Vector {
   get dim(): number {
     return this.values.length;
   }
+
   get x(): number {
     return this.values[0];
   }
+
+  set x(value: number) {
+    this.values[0] = value;
+  }
+
   get y(): number {
     return this.values[1];
   }
+
+  set y(value: number) {
+    this.values[1] = value;
+  }
+
   get z(): number {
     return this.values[2];
   }
+
+  set z(value: number) {
+    this.values[2] = value;
+  }
+
   get w(): number {
     return this.values[3];
+  }
+
+  set w(value: number) {
+    this.values[3] = value;
   }
 
   get xy(): Vector {
@@ -35,6 +55,16 @@ export class Vector {
 
   get xyz(): Vector {
     return new Vector(this.values[0], this.values[1], this.values[2]);
+  }
+
+  /**
+   * Sets the values of this vector
+   * @param values
+   * @returns
+   */
+  set(...values: number[]): Vector {
+    this.values.splice(0, this.values.length, ...values);
+    return this;
   }
 
   /**
