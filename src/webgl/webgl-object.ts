@@ -203,6 +203,9 @@ export class WebGLObject {
         throw Error(ERRORS.WEBGL_INIT);
       }
       const attribLoc = gl.getAttribLocation(program, name);
+      if (attribLoc === -1) {
+        continue;
+      }
       gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
       gl.bufferData(gl.ARRAY_BUFFER, attrib.data, gl.STATIC_DRAW);
       gl.enableVertexAttribArray(attribLoc);
@@ -256,7 +259,9 @@ export class WebGLObject {
     gl.useProgram(program);
     for (const key of Object.keys(buffers)) {
       const loc = gl.getAttribLocation(program, key);
-      gl.disableVertexAttribArray(loc);
+      if (loc > -1) {
+        gl.disableVertexAttribArray(loc);
+      }
     }
     return this;
   }
@@ -267,9 +272,18 @@ export class WebGLObject {
     for (const [key, buffer] of Object.entries(buffers)) {
       const attribute = geometry.attributes[key];
       const loc = gl.getAttribLocation(program, key);
-      gl.enableVertexAttribArray(loc);
-      gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-      gl.vertexAttribPointer(loc, attribute.recordSize, gl.FLOAT, false, 0, 0);
+      if (loc > -1) {
+        gl.enableVertexAttribArray(loc);
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+        gl.vertexAttribPointer(
+          loc,
+          attribute.recordSize,
+          gl.FLOAT,
+          false,
+          0,
+          0
+        );
+      }
     }
     return this;
   }
