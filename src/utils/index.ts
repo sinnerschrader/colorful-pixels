@@ -1,3 +1,4 @@
+import { Color } from './color';
 import { facesToBuffer } from './faces-to-buffer';
 import { calculateSurfaceNormal } from './surface-normals';
 import { Vector } from './vector';
@@ -20,4 +21,5 @@ export {
   frustum,
   perspective,
   Stopwatch,
+  Color,
 };
