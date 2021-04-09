@@ -71,9 +71,11 @@ function setUniformMatrix(
   }
   if (value.length === 9) {
     gl.uniformMatrix3fv(loc, transpose, value);
+    return true;
   }
   if (value.length === 16) {
     gl.uniformMatrix4fv(loc, transpose, value);
+    return true;
   }
   return false;
 }
