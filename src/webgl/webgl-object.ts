@@ -1,8 +1,18 @@
+import { Vector, Matrix, Color } from '../utils';
 import { BufferGeometry } from '../geometries';
 import { Texture } from './texture';
 import { ERRORS } from './webgl-errors';
 
-type Uniform = number | number[] | number[][] | bigint | bigint[] | Texture;
+type Uniform =
+  | number
+  | number[]
+  | number[][]
+  | bigint
+  | bigint[]
+  | Texture
+  | Vector
+  | Matrix
+  | Color;
 type Uniforms = Record<string, Uniform>;
 
 function setUniformVector(
@@ -83,6 +93,15 @@ function setUniform(
   if (uniform instanceof Texture) {
     gl.uniform1i(loc, (<Texture>uniform).textureIndex);
     return true;
+  }
+  if (uniform instanceof Vector) {
+    return setUniformIntVector(gl, loc, (<Vector>uniform).values);
+  }
+  if (uniform instanceof Matrix) {
+    return setUniformMatrix(gl, loc, (<Matrix>uniform).values);
+  }
+  if (uniform instanceof Color) {
+    return setUniformVector(gl, loc, (<Color>uniform).toVec4());
   }
   if (uniform instanceof Array) {
     if (typeof uniform[0] === 'number') {
