@@ -2,18 +2,7 @@ import { Vector, Matrix, Color } from '../utils';
 import { BufferGeometry } from '../geometries';
 import { Texture } from './texture';
 import { ERRORS } from './webgl-errors';
-
-type Uniform =
-  | number
-  | number[]
-  | number[][]
-  | bigint
-  | bigint[]
-  | Texture
-  | Vector
-  | Matrix
-  | Color;
-type Uniforms = Record<string, Uniform>;
+import { Uniform, Uniforms, Material } from './material';
 
 function setUniformVector(
   gl: WebGLRenderingContext,
@@ -152,13 +141,15 @@ export class WebGLObject {
   constructor(
     public gl: WebGLRenderingContext,
     public geometry: BufferGeometry,
-    public vertexShader: string,
-    public fragmentShader: string,
-    public drawMode = WebGLRenderingContext.TRIANGLES,
+    public material: Material,
     uniforms: Record<string, Uniform> = {}
   ) {
+    const { fragmentShader, vertexShader } = material;
     this.program = this.createProgram(vertexShader, fragmentShader);
-    this.uniforms = wrapUniforms(gl, this.program, uniforms);
+    this.uniforms = wrapUniforms(gl, this.program, {
+      ...material.uniforms,
+      ...uniforms,
+    });
     this.buffers = this.createBuffers(this.program, this.geometry);
     gl.useProgram(this.program);
     this.setUniforms();
@@ -261,7 +252,7 @@ export class WebGLObject {
   }
 
   recompile(): WebGLObject {
-    const { vertexShader, fragmentShader } = this;
+    const { vertexShader, fragmentShader } = this.material;
     this.program = this.createProgram(vertexShader, fragmentShader);
     return this;
   }
@@ -318,10 +309,15 @@ export class WebGLObject {
       if (this.geometry.indexType === 32) {
         indexType = WebGLRenderingContext.UNSIGNED_INT;
       }
-      this.gl.drawElements(this.drawMode, this.geometry.count, indexType, 0);
+      this.gl.drawElements(
+        this.material.drawMode,
+        this.geometry.count,
+        indexType,
+        0
+      );
       return this;
     }
-    this.gl.drawArrays(this.drawMode, 0, this.geometry.count);
+    this.gl.drawArrays(this.material.drawMode, 0, this.geometry.count);
     return this;
   }
 

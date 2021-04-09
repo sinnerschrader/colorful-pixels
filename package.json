@@ -23,7 +23,7 @@
     "lint:fix": "eslint --fix src",
     "test": "jest",
     "build:types": "tsc -d --emitDeclarationOnly",
-    "build:js": "esbuild --format=esm --bundle --minify src/index.ts > dist/index.esm.js",
+    "build:js": "node build",
     "build": "rm -rf dist && npm run build:types -s && npm run build:js -s"
   },
   "keywords": [
@@ -38,6 +38,7 @@
     "@typescript-eslint/eslint-plugin": "^4.20.0",
     "@typescript-eslint/parser": "^4.20.0",
     "esbuild": "^0.9.5",
+    "esbuild-plugin-glsl": "^1.0.3",
     "eslint": "^7.23.0",
     "jest": "^26.6.3",
     "jest-webgl-canvas-mock": "^0.2.3",
