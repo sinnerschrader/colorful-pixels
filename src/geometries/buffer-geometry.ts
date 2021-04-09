@@ -23,6 +23,7 @@ export class BufferGeometry {
   setIndex(indices: ArrayLike<number>, bits: 16 | 32 = 16): BufferGeometry {
     this.index = Array.from(indices);
     this.indexType = bits;
+    this.count = this.index.length;
     return this;
   }
 
@@ -31,7 +32,9 @@ export class BufferGeometry {
     bufferAttribute: BufferAttribute
   ): BufferGeometry {
     this.attributes[attributeName] = bufferAttribute;
-    this.count = Math.max(this.count, bufferAttribute.count);
+    if (!this.index) {
+      this.count = Math.max(this.count, bufferAttribute.count);
+    }
     return this;
   }
 
