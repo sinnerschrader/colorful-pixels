@@ -108,8 +108,6 @@ function buildPlane(
     }
   }
 
-  // update total number of vertices
-  vertexIndexStart += vertexCount;
   return {
     vertices,
     normals,
@@ -268,7 +266,7 @@ export function createBoxGeometry(
 
   const indices = Array.prototype.concat.apply(
     [],
-    [px.indices, nx.indices, py.indices, pz.indices]
+    [px.indices, nx.indices, py.indices, ny.indices, pz.indices, nz.indices]
   );
   const faceIndices = new Float32Array(
     Array.prototype.concat.apply(
