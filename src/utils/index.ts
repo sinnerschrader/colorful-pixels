@@ -6,6 +6,7 @@ import { Matrix, Mat2, Mat3, Mat4 } from './matrix';
 import { mix, clamp } from './one-liners';
 import { Stopwatch } from './stopwatch';
 import { ortho, frustum, perspective } from './perspective';
+import { Camera } from './camera';
 
 export {
   Vector,
@@ -22,4 +23,5 @@ export {
   perspective,
   Stopwatch,
   Color,
+  Camera,
 };

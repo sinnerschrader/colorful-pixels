@@ -15,6 +15,10 @@ import {
   Stopwatch,
   frustum,
   ortho,
+  Mat2,
+  Mat3,
+  Mat4,
+  Camera,
   perspective,
 } from './utils';
 import {
@@ -37,6 +41,10 @@ export { Texture, TextureData, WebGLObject, Renderer, Filter, Wrapping };
 export {
   Vector,
   Matrix,
+  Mat2,
+  Mat3,
+  Mat4,
+  Camera,
   calculateSurfaceNormal,
   facesToBuffer,
   mix,
