@@ -5,6 +5,7 @@ esbuild
   .build({
     entryPoints: ['src/index.ts'],
     bundle: true,
+    format: 'esm',
     minify: true,
     outdir: 'dist',
     plugins: [glsl({ minify: true })],
