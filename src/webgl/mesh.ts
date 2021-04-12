@@ -9,7 +9,7 @@ export class Mesh {
   uniforms: Uniforms;
 
   /**
-   * WebGLObject constructor
+   * Mesh constructor
    * @param gl the WebGL context
    * @param geometry a buffer geometry
    * @param material the material
@@ -129,12 +129,20 @@ export class Mesh {
     return buffers;
   }
 
+  /**
+   * Recompile shaders
+   * @returns this instance
+   */
   recompile(): Mesh {
     const { vertexShader, fragmentShader } = this.material;
     this.program = this.createProgram(vertexShader, fragmentShader);
     return this;
   }
 
+  /**
+   * Set uniform variables
+   * @returns this instance
+   */
   setUniforms(): Mesh {
     const { gl, program } = this;
     gl.useProgram(program);
@@ -144,6 +152,10 @@ export class Mesh {
     return this;
   }
 
+  /**
+   * enable attributes
+   * @returns this instance
+   */
   disableAttribs(): Mesh {
     const { gl, program, buffers } = this;
     gl.useProgram(program);
@@ -156,6 +168,10 @@ export class Mesh {
     return this;
   }
 
+  /**
+   * disable attributes
+   * @returns this instance
+   */
   enableAttribs(): Mesh {
     const { gl, program, buffers, geometry } = this;
     gl.useProgram(program);
@@ -178,6 +194,10 @@ export class Mesh {
     return this;
   }
 
+  /**
+   * Call drawElements or drawArrays
+   * @returns this instance
+   */
   draw(): Mesh {
     if (this.geometry.index !== null) {
       let indexType = WebGLRenderingContext.NONE;
@@ -199,6 +219,9 @@ export class Mesh {
     return this;
   }
 
+  /**
+   * Free attributes, buffers and delete the program
+   */
   dispose(): void {
     const { gl, program } = this;
     for (const [key, buffer] of Object.entries(this.buffers)) {
