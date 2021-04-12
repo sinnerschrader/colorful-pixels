@@ -1,164 +1,33 @@
-import { Vector, Matrix, Color } from '../utils';
 import { BufferGeometry } from '../geometries';
-import { Texture } from './texture';
 import { ERRORS } from './webgl-errors';
+import { Uniform, Uniforms, Material } from './material';
+import { setUniform, wrapUniforms } from '../utils';
 
-type Uniform =
-  | number
-  | number[]
-  | number[][]
-  | bigint
-  | bigint[]
-  | Texture
-  | Vector
-  | Matrix
-  | Color;
-type Uniforms = Record<string, Uniform>;
-
-function setUniformVector(
-  gl: WebGLRenderingContext,
-  loc: WebGLUniformLocation | null,
-  value: number[]
-): boolean {
-  switch (value.length) {
-    case 1:
-      gl.uniform1fv(loc, value);
-      return true;
-    case 2:
-      gl.uniform2fv(loc, value);
-      return true;
-    case 3:
-      gl.uniform3fv(loc, value);
-      return true;
-    case 4:
-      gl.uniform4fv(loc, value);
-      return true;
-  }
-  return false;
-}
-
-function setUniformIntVector(
-  gl: WebGLRenderingContext,
-  loc: WebGLUniformLocation | null,
-  value: number[]
-): boolean {
-  switch (value.length) {
-    case 1:
-      gl.uniform1iv(loc, value);
-      return true;
-    case 2:
-      gl.uniform2iv(loc, value);
-      return true;
-    case 3:
-      gl.uniform3iv(loc, value);
-      return true;
-    case 4:
-      gl.uniform4iv(loc, value);
-      return true;
-  }
-  return false;
-}
-
-function setUniformMatrix(
-  gl: WebGLRenderingContext,
-  loc: WebGLUniformLocation | null,
-  value: number[],
-  transpose = false
-): boolean {
-  if (value.length === 4) {
-    gl.uniformMatrix2fv(loc, transpose, value);
-    return true;
-  }
-  if (value.length === 9) {
-    gl.uniformMatrix3fv(loc, transpose, value);
-    return true;
-  }
-  if (value.length === 16) {
-    gl.uniformMatrix4fv(loc, transpose, value);
-    return true;
-  }
-  return false;
-}
-
-function setUniform(
-  gl: WebGLRenderingContext,
-  program: WebGLProgram,
-  name: string,
-  uniform: Uniform
-): boolean {
-  gl.useProgram(program);
-  const loc = gl.getUniformLocation(program, name);
-  if (typeof uniform === 'number') {
-    gl.uniform1f(loc, uniform);
-    return true;
-  }
-  if (uniform instanceof Texture) {
-    gl.uniform1i(loc, (<Texture>uniform).textureIndex);
-    return true;
-  }
-  if (uniform instanceof Vector) {
-    return setUniformIntVector(gl, loc, (<Vector>uniform).values);
-  }
-  if (uniform instanceof Matrix) {
-    return setUniformMatrix(gl, loc, (<Matrix>uniform).values);
-  }
-  if (uniform instanceof Color) {
-    return setUniformVector(gl, loc, (<Color>uniform).toVec4());
-  }
-  if (uniform instanceof Array) {
-    if (typeof uniform[0] === 'number') {
-      return setUniformVector(gl, loc, <number[]>uniform);
-    }
-    if (typeof uniform[0] === 'bigint') {
-      const converter = (val: bigint): number => parseInt(val.toString(), 10);
-      return setUniformIntVector(gl, loc, (<bigint[]>uniform).map(converter));
-    }
-    if (uniform[0] instanceof Array) {
-      return setUniformMatrix(gl, loc, (<number[][]>uniform).flat(1));
-    }
-  }
-  return false;
-}
-
-/**
- * Create a wrapper object from a uniforms object which automatically updates
- * uniforms in the rendering context
- * @param gl a WebGLRenderingContext initialized via canvas.getContext('webgl')
- * @param uniform
- * @returns wrapper object
- */
-function wrapUniforms(
-  gl: WebGLRenderingContext,
-  program: WebGLProgram,
-  uniform: Uniforms
-) {
-  const handler: ProxyHandler<Uniforms> = {
-    get(target: Uniforms, prop: string) {
-      return target[prop];
-    },
-    set(target: Uniforms, prop: string, value: Uniform): boolean {
-      target[prop] = value;
-      return setUniform(gl, program, prop, value as Uniform);
-    },
-  };
-  return new Proxy<Uniforms>(uniform, handler);
-}
-
-export class WebGLObject {
+export class Mesh {
   buffers: Record<string, WebGLBuffer> = {};
   program: WebGLProgram;
   uniforms: Uniforms;
 
+  /**
+   * Mesh constructor
+   * @param gl the WebGL context
+   * @param geometry a buffer geometry
+   * @param material the material
+   * @param uniforms additional uniforms
+   */
   constructor(
     public gl: WebGLRenderingContext,
     public geometry: BufferGeometry,
-    public vertexShader: string,
-    public fragmentShader: string,
-    public drawMode = WebGLRenderingContext.TRIANGLES,
+    public material: Material,
     uniforms: Record<string, Uniform> = {}
   ) {
+    const { fragmentShader, vertexShader } = material;
     this.program = this.createProgram(vertexShader, fragmentShader);
-    this.uniforms = wrapUniforms(gl, this.program, uniforms);
+    this.uniforms = wrapUniforms(gl, this.program, {
+      ...material.uniforms,
+      ...uniforms,
+    });
+    material.uniforms = this.uniforms;
     this.buffers = this.createBuffers(this.program, this.geometry);
     gl.useProgram(this.program);
     this.setUniforms();
@@ -260,13 +129,21 @@ export class WebGLObject {
     return buffers;
   }
 
-  recompile(): WebGLObject {
-    const { vertexShader, fragmentShader } = this;
+  /**
+   * Recompile shaders
+   * @returns this instance
+   */
+  recompile(): Mesh {
+    const { vertexShader, fragmentShader } = this.material;
     this.program = this.createProgram(vertexShader, fragmentShader);
     return this;
   }
 
-  setUniforms(): WebGLObject {
+  /**
+   * Set uniform variables
+   * @returns this instance
+   */
+  setUniforms(): Mesh {
     const { gl, program } = this;
     gl.useProgram(program);
     for (const [name, value] of Object.entries(this.uniforms)) {
@@ -275,7 +152,11 @@ export class WebGLObject {
     return this;
   }
 
-  disableAttribs(): WebGLObject {
+  /**
+   * enable attributes
+   * @returns this instance
+   */
+  disableAttribs(): Mesh {
     const { gl, program, buffers } = this;
     gl.useProgram(program);
     for (const key of Object.keys(buffers)) {
@@ -287,7 +168,11 @@ export class WebGLObject {
     return this;
   }
 
-  enableAttribs(): WebGLObject {
+  /**
+   * disable attributes
+   * @returns this instance
+   */
+  enableAttribs(): Mesh {
     const { gl, program, buffers, geometry } = this;
     gl.useProgram(program);
     for (const [key, buffer] of Object.entries(buffers)) {
@@ -309,7 +194,11 @@ export class WebGLObject {
     return this;
   }
 
-  draw(): WebGLObject {
+  /**
+   * Call drawElements or drawArrays
+   * @returns this instance
+   */
+  draw(): Mesh {
     if (this.geometry.index !== null) {
       let indexType = WebGLRenderingContext.NONE;
       if (this.geometry.indexType === 16) {
@@ -318,13 +207,21 @@ export class WebGLObject {
       if (this.geometry.indexType === 32) {
         indexType = WebGLRenderingContext.UNSIGNED_INT;
       }
-      this.gl.drawElements(this.drawMode, this.geometry.count, indexType, 0);
+      this.gl.drawElements(
+        this.material.drawMode,
+        this.geometry.count,
+        indexType,
+        0
+      );
       return this;
     }
-    this.gl.drawArrays(this.drawMode, 0, this.geometry.count);
+    this.gl.drawArrays(this.material.drawMode, 0, this.geometry.count);
     return this;
   }
 
+  /**
+   * Free attributes, buffers and delete the program
+   */
   dispose(): void {
     const { gl, program } = this;
     for (const [key, buffer] of Object.entries(this.buffers)) {

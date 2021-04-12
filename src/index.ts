@@ -20,10 +20,14 @@ import {
   Mat4,
   Camera,
   perspective,
+  Uniform,
+  Uniforms,
+  wrapUniforms,
+  setUniform,
 } from './utils';
 import {
   Texture,
-  WebGLObject,
+  Mesh,
   Renderer,
   Filter,
   Wrapping,
@@ -37,7 +41,7 @@ export {
   createPlaneGeometry,
   createSphereGeometry,
 };
-export { Texture, TextureData, WebGLObject, Renderer, Filter, Wrapping };
+export { Texture, TextureData, Mesh, Renderer, Filter, Wrapping };
 export {
   Vector,
   Matrix,
@@ -53,4 +57,8 @@ export {
   frustum,
   perspective,
   Stopwatch,
+  Uniforms,
+  Uniform,
+  wrapUniforms,
+  setUniform,
 };
