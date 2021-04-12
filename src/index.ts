@@ -32,6 +32,11 @@ import {
   Filter,
   Wrapping,
   TextureData,
+  Material,
+  createBasicMaterial,
+  createDefaultMaterial,
+  createNormalMaterial,
+  createShaderMaterial,
 } from './webgl';
 
 export {
@@ -41,7 +46,19 @@ export {
   createPlaneGeometry,
   createSphereGeometry,
 };
-export { Texture, TextureData, Mesh, Renderer, Filter, Wrapping };
+export {
+  Texture,
+  TextureData,
+  Mesh,
+  Renderer,
+  Filter,
+  Wrapping,
+  Material,
+  createDefaultMaterial,
+  createBasicMaterial,
+  createNormalMaterial,
+  createShaderMaterial,
+};
 export {
   Vector,
   Matrix,
