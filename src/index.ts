@@ -24,6 +24,7 @@ import {
   Uniforms,
   wrapUniforms,
   setUniform,
+  Color,
 } from './utils';
 import {
   Texture,
@@ -62,6 +63,7 @@ export {
 export {
   Vector,
   Matrix,
+  Color,
   Mat2,
   Mat3,
   Mat4,
