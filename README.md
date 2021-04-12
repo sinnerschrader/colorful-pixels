@@ -21,7 +21,7 @@ This is actually a project by [Lea](https://github.com/terabaud), and she decide
 ## Getting started
 
 - First, add colorful pixels to your project via `npm install colorful-pixels`.
-- Add a `<canvas>` element to your DOM,
+- Add a `<canvas>` element to your DOM
 - Initialize the WebGL renderer
 - Add a resize event handler
 - create a scene, consisting of Meshes (a scene is an array of meshes)
@@ -116,13 +116,13 @@ const d = a.add(b);
 
 ### Create translation Matrices
 
-```
+```js
 // identity matrix
-const identity = Mat4.identity()
+const identity = Mat4.identity();
 // translate object in space
 const translationMatrix = Mat4.translation(tx, ty, tz);
 // rotation matrix
-const DEG = Math.PI / 180
+const DEG = Math.PI / 180;
 const rX = Mat4.rotX(30 * DEG);
 const rZ = Mat4.rotY(45 * DEG);
 const rZ = Mat4.rotZ(-5 * DEG);
