@@ -25,7 +25,7 @@ export type Material = {
   uniforms: Uniforms;
 };
 
-export function createDefaultMaterial() {
+export function createDefaultMaterial(): Material {
   return {
     vertexShader: defaultVertexShader,
     fragmentShader: defaultFragmentShader,
@@ -34,7 +34,7 @@ export function createDefaultMaterial() {
   };
 }
 
-export function createNormalMaterial() {
+export function createNormalMaterial(): Material {
   return {
     vertexShader: defaultVertexShader,
     fragmentShader: normalFragmentShader,
@@ -43,7 +43,7 @@ export function createNormalMaterial() {
   };
 }
 
-export function createBasicMaterial() {
+export function createBasicMaterial(): Material {
   return {
     vertexShader: defaultVertexShader,
     fragmentShader: basicFragmentShader,
@@ -58,7 +58,7 @@ export function createShaderMaterial(
   vertexShader = defaultVertexShader,
   fragmentShader = defaultFragmentShader,
   uniforms: Record<string, Uniform> = {}
-) {
+): Material {
   return {
     vertexShader,
     fragmentShader,

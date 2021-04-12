@@ -7,6 +7,8 @@ import { mix, clamp } from './one-liners';
 import { Stopwatch } from './stopwatch';
 import { ortho, frustum, perspective } from './perspective';
 import { Camera } from './camera';
+import { Material, Uniform, Uniforms } from '../webgl/material';
+import { setUniform, wrapUniforms } from './uniform-helpers';
 
 export {
   Vector,
@@ -24,4 +26,9 @@ export {
   Stopwatch,
   Color,
   Camera,
+  Material,
+  Uniform,
+  Uniforms,
+  wrapUniforms,
+  setUniform,
 };

@@ -1,6 +1,6 @@
 import { Filter, Texture, TextureData, Wrapping } from './texture';
 
-import { WebGLObject } from './webgl-object';
+import { Mesh } from './mesh';
 import { Renderer } from './renderer';
 
-export { Texture, WebGLObject, Renderer, Filter, Wrapping, TextureData };
+export { Texture, Mesh, Renderer, Filter, Wrapping, TextureData };

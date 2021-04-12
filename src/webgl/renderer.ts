@@ -1,5 +1,5 @@
 import { ERRORS } from './webgl-errors';
-import { WebGLObject } from './webgl-object';
+import { Mesh } from './mesh';
 
 export class Renderer {
   gl: WebGLRenderingContext;
@@ -13,7 +13,7 @@ export class Renderer {
     this.gl = gl;
   }
 
-  render(scene: WebGLObject[]): Renderer {
+  render(scene: Mesh[]): Renderer {
     for (const obj of scene) {
       // render the thing.
       obj.enableAttribs();
