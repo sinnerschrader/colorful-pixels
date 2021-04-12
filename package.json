@@ -1,6 +1,6 @@
 {
   "name": "colorful-pixels",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A WebGL library",
   "repository": "sinnerschrader/colorful-pixels",
   "type": "module",
