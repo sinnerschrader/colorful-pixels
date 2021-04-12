@@ -4,13 +4,13 @@
   "description": "A WebGL library",
   "repository": "sinnerschrader/colorful-pixels",
   "type": "module",
-  "main": "index/index.esm.js",
-  "module": "dist/index.esm.js",
+  "main": "index/index.js",
+  "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "sideEffects": false,
   "exports": {
     ".": {
-      "import": "./dist/index.esm.js"
+      "import": "./dist/index.js"
     }
   },
   "files": [
