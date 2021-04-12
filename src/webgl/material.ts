@@ -1,6 +1,11 @@
 import { Texture } from '.';
 import { Vector, Matrix, Color } from '../utils';
 
+import defaultVertexShader from '../shaders/default.vert';
+import defaultFragmentShader from '../shaders/default.frag';
+import basicFragmentShader from '../shaders/basic.frag';
+import normalFragmentShader from '../shaders/default.frag';
+
 export type Uniform =
   | number
   | number[]
@@ -20,6 +25,44 @@ export type Material = {
   uniforms: Uniforms;
 };
 
-export function createNormalMaterial() {}
+export function createDefaultMaterial() {
+  return {
+    vertexShader: defaultVertexShader,
+    fragmentShader: defaultFragmentShader,
+    drawMode: WebGLRenderingContext.TRIANGLES,
+    uniforms: {},
+  };
+}
 
-export function createBasicMaterial() {}
+export function createNormalMaterial() {
+  return {
+    vertexShader: defaultVertexShader,
+    fragmentShader: normalFragmentShader,
+    drawMode: WebGLRenderingContext.TRIANGLES,
+    uniforms: {},
+  };
+}
+
+export function createBasicMaterial() {
+  return {
+    vertexShader: defaultVertexShader,
+    fragmentShader: basicFragmentShader,
+    drawMode: WebGLRenderingContext.TRIANGLES,
+    uniforms: {
+      color: new Color(255, 0, 0),
+    },
+  };
+}
+
+export function createShaderMaterial(
+  vertexShader = defaultVertexShader,
+  fragmentShader = defaultFragmentShader,
+  uniforms: Record<string, Uniform> = {}
+) {
+  return {
+    vertexShader,
+    fragmentShader,
+    drawMode: WebGLRenderingContext.TRIANGLES,
+    uniforms,
+  };
+}

@@ -1,5 +1,6 @@
-const esbuild = require('esbuild');
-const { glsl } = require('esbuild-plugin-glsl');
+import esbuild from 'esbuild';
+import { glsl } from 'esbuild-plugin-glsl';
+
 esbuild
   .build({
     entryPoints: ['src/index.ts'],

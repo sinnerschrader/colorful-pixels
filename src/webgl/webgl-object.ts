@@ -138,6 +138,13 @@ export class WebGLObject {
   program: WebGLProgram;
   uniforms: Uniforms;
 
+  /**
+   * WebGLObject constructor
+   * @param gl the WebGL context
+   * @param geometry a buffer geometry
+   * @param material the material
+   * @param uniforms additional uniforms
+   */
   constructor(
     public gl: WebGLRenderingContext,
     public geometry: BufferGeometry,
@@ -150,6 +157,7 @@ export class WebGLObject {
       ...material.uniforms,
       ...uniforms,
     });
+    material.uniforms = this.uniforms;
     this.buffers = this.createBuffers(this.program, this.geometry);
     gl.useProgram(this.program);
     this.setUniforms();
