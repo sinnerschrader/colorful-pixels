@@ -4,7 +4,7 @@ import { Vector, Matrix, Color } from '../utils';
 import defaultVertexShader from '../shaders/default.vert';
 import defaultFragmentShader from '../shaders/default.frag';
 import basicFragmentShader from '../shaders/basic.frag';
-import normalFragmentShader from '../shaders/default.frag';
+import normalFragmentShader from '../shaders/normal.frag';
 
 export type Uniform =
   | number
