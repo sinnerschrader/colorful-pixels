@@ -9,10 +9,13 @@ This is actually a project by [Lea](https://github.com/terabaud), and she decide
 
 ## Features
 
+- An API that is somewhat familiar to THREE
 - `Vector`, `Matrix` classes
-- a `Renderer` which renders `WebGLObject`s
-- a `WebGLObject` contains a `BufferGeometry`, uniform variables, vertex and fragment shaders
-- the `BufferGeometry` API is similar to in three.js
+- a `Renderer` which renders `Mesh`es
+- a `Mesh` contains a `BufferGeometry` and a `Material`,
+- a `Material` is what's a `RawShaderMaterial` in THREE, it has uniform variables, vertex and fragment shaders and a `drawMode`
+- the `drawMode` is one of those WebGL constants `gl.TRIANGLES`, `gl.POINTS`, `gl.LINES`...
+- the `BufferGeometry` API is also similar to three.js
 - Helpers for creating orthographic, perspective projection matrices
 - A `Stopwatch` class for timing (like `performance.now()` but with the possibility to start/stop)
 - One-Liners (`mix`, `clamp`)
@@ -52,12 +55,23 @@ const sphereGeometry = createSphereGeometry(1, 1, 16, 16);
 in `colorful-pixels`, a material contains a `vertexShader`, a `fragmentShader`, a `drawMode` and a `uniforms` object.
 When a mesh is initialized, the `uniforms` object is wrapped by a ES6 Proxy, so the state in the gl context is automatically updated.
 
+The default drawMode is `gl.TRIANGLES`, see [MDN:drawArrays](https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/drawArrays) for more options.
+
 ```js
 const material = createShaderMaterial(vertexShader, fragmentShader, {
   time: 0,
   resolution: [800, 600],
   color: Color.fromHex('#ff00ff'),
 });
+
+// There are some predefined materials:
+
+// just red
+const defaultMaterial = createDefaultMaterial();
+// just pink
+const basicMaterial = createBasicMaterial('#ff00ff');
+// the normals
+const normalMaterial = createNormalMaterial();
 ```
 
 ### Create a mesh and render
