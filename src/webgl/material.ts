@@ -43,13 +43,13 @@ export function createNormalMaterial(): Material {
   };
 }
 
-export function createBasicMaterial(): Material {
+export function createBasicMaterial(color = '#ff0000'): Material {
   return {
     vertexShader: defaultVertexShader,
     fragmentShader: basicFragmentShader,
     drawMode: WebGLRenderingContext.TRIANGLES,
     uniforms: {
-      color: new Color(255, 0, 0),
+      color: Color.fromHex(color),
     },
   };
 }
@@ -57,12 +57,13 @@ export function createBasicMaterial(): Material {
 export function createShaderMaterial(
   vertexShader = defaultVertexShader,
   fragmentShader = defaultFragmentShader,
-  uniforms: Record<string, Uniform> = {}
+  uniforms: Record<string, Uniform> = {},
+  drawMode = WebGLRenderingContext.TRIANGLES
 ): Material {
   return {
     vertexShader,
     fragmentShader,
-    drawMode: WebGLRenderingContext.TRIANGLES,
+    drawMode,
     uniforms,
   };
 }
