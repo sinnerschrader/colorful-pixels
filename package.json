@@ -4,7 +4,7 @@
   "description": "A WebGL library",
   "repository": "sinnerschrader/colorful-pixels",
   "type": "module",
-  "main": "index/index.js",
+  "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "sideEffects": false,
