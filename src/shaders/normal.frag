@@ -7,6 +7,6 @@ uniform float time;
 uniform vec2 resolution;
 
 void main() {
-  color += vec3(vNormal.x, vNormal.y, 1.);
+  vec3 color = vec3(vNormal.x, vNormal.y, 1.);
   gl_FragColor = vec4(color,1.);
 }
