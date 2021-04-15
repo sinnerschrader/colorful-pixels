@@ -1,34 +1,45 @@
 import { BufferGeometry } from '../geometries';
 import { ERRORS } from './webgl-errors';
-import { Uniform, Uniforms, Material } from './material';
+import { Material } from './material';
 import { setUniform, wrapUniforms } from '../utils';
 
 export class Mesh {
   buffers: Record<string, WebGLBuffer> = {};
-  program: WebGLProgram;
-  uniforms: Uniforms;
+  program: WebGLProgram | null = null;
+  gl: WebGLRenderingContext | null = null;
 
   /**
    * Mesh constructor
-   * @param gl the WebGL context
    * @param geometry a buffer geometry
    * @param material the material
-   * @param uniforms additional uniforms
    */
   constructor(
-    public gl: WebGLRenderingContext,
     public geometry: BufferGeometry,
     public material: Material,
-    uniforms: Record<string, Uniform> = {}
-  ) {
+    public bufferUsage = WebGLRenderingContext.DYNAMIC_DRAW
+  ) {}
+
+  /**
+   * Initialize this mesh inside a WebGLRenderingContext, does nothing if already initialized.
+   * @param gl the WebGLRenderingContext
+   * @returns
+   */
+  init(gl: WebGLRenderingContext): void {
+    if (this.gl) {
+      // already initialized
+      return;
+    }
+    this.gl = gl;
+    const { material } = this;
     const { fragmentShader, vertexShader } = material;
     this.program = this.createProgram(vertexShader, fragmentShader);
-    this.uniforms = wrapUniforms(gl, this.program, {
-      ...material.uniforms,
-      ...uniforms,
-    });
-    material.uniforms = this.uniforms;
-    this.buffers = this.createBuffers(this.program, this.geometry);
+    const uniformsProxy = wrapUniforms(
+      this.gl,
+      this.program,
+      material.uniforms
+    );
+    material.uniforms = uniformsProxy;
+    this.createBuffers();
     gl.useProgram(this.program);
     this.setUniforms();
   }
@@ -78,11 +89,8 @@ export class Mesh {
     return program;
   }
 
-  private createBuffers(
-    program: WebGLProgram,
-    geometry: BufferGeometry
-  ): Record<string, WebGLBuffer> {
-    const { gl } = this;
+  private createBuffers(): Mesh {
+    const { gl, program, geometry } = this;
     if (!gl || !program) {
       throw Error(ERRORS.WEBGL_INIT);
     }
@@ -97,7 +105,7 @@ export class Mesh {
         continue;
       }
       gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-      gl.bufferData(gl.ARRAY_BUFFER, attrib.data, gl.STATIC_DRAW);
+      gl.bufferData(gl.ARRAY_BUFFER, attrib.data, this.bufferUsage);
       gl.enableVertexAttribArray(attribLoc);
       gl.vertexAttribPointer(
         attribLoc,
@@ -123,10 +131,40 @@ export class Mesh {
       if (geometry.indexType === 32) {
         data = new Uint32Array(geometry.index);
       }
-      gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, data, gl.STATIC_DRAW);
+      gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, data, this.bufferUsage);
       buffers['_index'] = indexBuffer;
     }
-    return buffers;
+    this.buffers = buffers;
+    return this;
+  }
+
+  private deleteBuffers(): Mesh {
+    const { gl, program } = this;
+    if (!gl || !program) {
+      return this;
+    }
+    for (const [key, buffer] of Object.entries(this.buffers)) {
+      if (!key.startsWith('_')) {
+        const loc = gl.getAttribLocation(program, key);
+        gl.disableVertexAttribArray(loc);
+      }
+      gl.deleteBuffer(buffer);
+    }
+    this.buffers = {};
+    return this;
+  }
+
+  /**
+   * Update Buffers
+   * @returns this instance
+   */
+  updateBuffers(): Mesh {
+    if (!this.gl || !this.program) {
+      throw Error(ERRORS.WEBGL_INIT);
+    }
+    this.deleteBuffers();
+    this.createBuffers();
+    return this;
   }
 
   /**
@@ -144,9 +182,12 @@ export class Mesh {
    * @returns this instance
    */
   setUniforms(): Mesh {
-    const { gl, program } = this;
+    const { gl, program, material } = this;
+    if (!gl || !program) {
+      throw Error(ERRORS.WEBGL_INIT);
+    }
     gl.useProgram(program);
-    for (const [name, value] of Object.entries(this.uniforms)) {
+    for (const [name, value] of Object.entries(material.uniforms)) {
       setUniform(gl, program, name, value);
     }
     return this;
@@ -158,6 +199,9 @@ export class Mesh {
    */
   disableAttribs(): Mesh {
     const { gl, program, buffers } = this;
+    if (!gl || !program) {
+      throw Error(ERRORS.WEBGL_INIT);
+    }
     gl.useProgram(program);
     for (const key of Object.keys(buffers)) {
       const loc = gl.getAttribLocation(program, key);
@@ -174,6 +218,9 @@ export class Mesh {
    */
   enableAttribs(): Mesh {
     const { gl, program, buffers, geometry } = this;
+    if (!gl || !program) {
+      throw Error(ERRORS.WEBGL_INIT);
+    }
     gl.useProgram(program);
     for (const [key, buffer] of Object.entries(buffers)) {
       const attribute = geometry.attributes[key];
@@ -199,38 +246,40 @@ export class Mesh {
    * @returns this instance
    */
   draw(): Mesh {
-    if (this.geometry.index !== null) {
+    const { gl, geometry, material } = this;
+    if (!gl) {
+      throw Error(ERRORS.WEBGL_INIT);
+    }
+    if (geometry.index !== null) {
       let indexType = WebGLRenderingContext.NONE;
-      if (this.geometry.indexType === 16) {
+      if (geometry.indexType === 16) {
         indexType = WebGLRenderingContext.UNSIGNED_SHORT;
       }
-      if (this.geometry.indexType === 32) {
+      if (geometry.indexType === 32) {
         indexType = WebGLRenderingContext.UNSIGNED_INT;
       }
-      this.gl.drawElements(
-        this.material.drawMode,
-        this.geometry.count,
-        indexType,
-        0
-      );
+      gl.drawElements(material.drawMode, geometry.count, indexType, 0);
       return this;
     }
-    this.gl.drawArrays(this.material.drawMode, 0, this.geometry.count);
+    // non-indexed geometries are drawn via drawArrays
+    gl.drawArrays(material.drawMode, 0, geometry.count);
     return this;
   }
 
   /**
-   * Free attributes, buffers and delete the program
+   * Free attributes, buffers and delete the program and disconnect the mesh from the WebGL context
    */
   dispose(): void {
     const { gl, program } = this;
-    for (const [key, buffer] of Object.entries(this.buffers)) {
-      if (!key.startsWith('_')) {
-        const loc = gl.getAttribLocation(program, key);
-        gl.disableVertexAttribArray(loc);
-      }
-      gl.deleteBuffer(buffer);
+    if (!gl || !program) {
+      // no dispose necessary
+      return;
     }
+    this.deleteBuffers();
     gl.deleteProgram(program);
+    this.gl = null;
+    this.program = null;
+    // release the ES6 proxy by cloning the uniforms object
+    this.material.uniforms = { ...this.material.uniforms };
   }
 }

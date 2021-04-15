@@ -77,7 +77,7 @@ const normalMaterial = createNormalMaterial();
 ### Create a mesh and render
 
 ```js
-const mesh = new Mesh(renderer.gl, geometry, material);
+const mesh = new Mesh(geometry, material);
 
 // currently, the scene is just an array of meshes:
 const scene = [mesh];
@@ -96,7 +96,7 @@ camera.update();
 console.log('camera matrix:', cameraMatrix);
 console.log('view matrix:', viewMatrix);
 // the view matrix is the inverse of the camera matrix
-// you can pass these into the material.uniforms object, also accessible from the mesh.uniforms object.
+// you can pass these into the material.uniforms object.
 ```
 
 ### Perspective projection

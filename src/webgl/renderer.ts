@@ -15,6 +15,9 @@ export class Renderer {
 
   render(scene: Mesh[]): Renderer {
     for (const obj of scene) {
+      // initialize the mesh for this rendering context
+      // if you need to reuse this mesh in another context, then dispose first
+      obj.init(this.gl);
       // render the thing.
       obj.enableAttribs();
       obj.draw();
