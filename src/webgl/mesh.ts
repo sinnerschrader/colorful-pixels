@@ -168,18 +168,19 @@ export class Mesh {
   }
 
   /**
-   * Update data of a single attribute
-   * @param attribName
-   * @param offset
-   * @param newData
-   * @param syncGeometry
+   * Update buffer of a single attribute
+   * @param attribName name of the attribute to be updated
+   * @param newData the new data
+   * @param offset offset (default = 0)
+   * @param syncGeometry also keep the underlying geometry data in sync (default = true)
+   * @returns current instance
    */
   updateBuffer(
     attribName: string,
-    offset: number,
     newData: Float32Array,
+    offset = 0,
     syncGeometry = true
-  ) {
+  ): Mesh {
     const { geometry, gl } = this;
     const buffer = this.buffers[attribName];
     if (syncGeometry) {
@@ -189,6 +190,7 @@ export class Mesh {
       gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
       gl.bufferSubData(gl.ARRAY_BUFFER, offset, newData);
     }
+    return this;
   }
 
   /**
