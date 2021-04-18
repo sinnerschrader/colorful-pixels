@@ -155,7 +155,7 @@ export class Mesh {
   }
 
   /**
-   * Update Buffers
+   * Update all buffers
    * @returns this instance
    */
   updateBuffers(): Mesh {
@@ -168,11 +168,39 @@ export class Mesh {
   }
 
   /**
+   * Update data of a single attribute
+   * @param attribName
+   * @param offset
+   * @param newData
+   * @param syncGeometry
+   */
+  updateBuffer(
+    attribName: string,
+    offset: number,
+    newData: Float32Array,
+    syncGeometry = true
+  ) {
+    const { geometry, gl } = this;
+    const buffer = this.buffers[attribName];
+    if (syncGeometry) {
+      geometry.attributes[attribName].data.set(newData, offset);
+    }
+    if (gl && buffer !== null) {
+      gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+      gl.bufferSubData(gl.ARRAY_BUFFER, offset, newData);
+    }
+  }
+
+  /**
    * Recompile shaders
    * @returns this instance
    */
   recompile(): Mesh {
+    const { gl, program } = this;
     const { vertexShader, fragmentShader } = this.material;
+    if (gl && program) {
+      gl.deleteProgram(program);
+    }
     this.program = this.createProgram(vertexShader, fragmentShader);
     return this;
   }
