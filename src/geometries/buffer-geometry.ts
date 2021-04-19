@@ -19,6 +19,7 @@ export class BufferGeometry {
   count = 0;
   index: number[] | null = null;
   indexType: 0 | 16 | 32 = 0;
+  groups: BufferGroup[] = [];
 
   setIndex(indices: ArrayLike<number>, bits: 16 | 32 = 16): BufferGeometry {
     this.index = Array.from(indices);
@@ -104,6 +105,13 @@ export class BufferGeometry {
         new BufferAttribute(new Float32Array(newAttrib), recordSize)
       );
     }
+    if (a.groups.length === 0) {
+      result.groups.push({ startIndex: 0, count: countA });
+    }
+    result.groups.push(...a.groups, {
+      startIndex: countA,
+      count: countB,
+    });
     return result;
   }
 
