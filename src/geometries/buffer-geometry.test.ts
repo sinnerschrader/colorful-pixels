@@ -62,6 +62,10 @@ describe('BufferGeometry tests', () => {
        2,  2, 0, // top right
       -2,  2, 0, // top left
     ]);
+    expect(merged.groups).toEqual([
+      { startIndex: 0, count: 6 },
+      { startIndex: 6, count: 6 },
+    ]);
   });
 
   test('merging two indexed geometries', () => {
@@ -91,5 +95,9 @@ describe('BufferGeometry tests', () => {
       -1,  1, 0  // top left
     ]);
     expect(merged.index).toEqual([0, 1, 2, 5, 4, 3]);
+    expect(merged.groups).toEqual([
+      { startIndex: 0, count: 3 },
+      { startIndex: 3, count: 3 },
+    ]);
   });
 });

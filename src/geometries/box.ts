@@ -1,5 +1,7 @@
 import { BufferAttribute, BufferGeometry } from './buffer-geometry';
 
+// adapted from THREE.js
+
 /**
  * Build a plane
  *
@@ -281,8 +283,26 @@ export function createBoxGeometry(
       ]
     )
   );
-
   const geometry = new BufferGeometry();
+  let groupIndex = 0;
+
+  geometry.groups.push({ startIndex: groupIndex, count: px.indices.length });
+  groupIndex += px.indices.length;
+
+  geometry.groups.push({ startIndex: groupIndex, count: nx.indices.length });
+  groupIndex += nx.indices.length;
+
+  geometry.groups.push({ startIndex: groupIndex, count: py.indices.length });
+  groupIndex += py.indices.length;
+
+  geometry.groups.push({ startIndex: groupIndex, count: ny.indices.length });
+  groupIndex += ny.indices.length;
+
+  geometry.groups.push({ startIndex: groupIndex, count: pz.indices.length });
+  groupIndex += pz.indices.length;
+
+  geometry.groups.push({ startIndex: groupIndex, count: nz.indices.length });
+
   geometry.setAttribute('position', new BufferAttribute(vertices, 3));
   geometry.setAttribute('normal', new BufferAttribute(normals, 3));
   geometry.setAttribute('uv', new BufferAttribute(uvs, 2));
