@@ -9,6 +9,8 @@ import { ortho, frustum, perspective } from './perspective';
 import { Camera } from './camera';
 import { Material, Uniform, Uniforms } from '../webgl/material';
 import { setUniform, wrapUniforms } from './uniform-helpers';
+import { createIndexedGeometry } from './indexed-geometry';
+import { mergeGeometries } from './merge-geometries';
 
 export {
   Vector,
@@ -31,4 +33,6 @@ export {
   Uniforms,
   wrapUniforms,
   setUniform,
+  mergeGeometries,
+  createIndexedGeometry,
 };
