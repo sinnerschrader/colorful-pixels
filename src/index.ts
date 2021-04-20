@@ -25,6 +25,8 @@ import {
   wrapUniforms,
   setUniform,
   Color,
+  mergeGeometries,
+  createIndexedGeometry,
 } from './utils';
 import {
   Texture,
@@ -80,4 +82,6 @@ export {
   Uniform,
   wrapUniforms,
   setUniform,
+  mergeGeometries,
+  createIndexedGeometry,
 };
