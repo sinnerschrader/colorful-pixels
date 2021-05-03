@@ -97,8 +97,8 @@ const camera = new Camera();
 camera.position.set(0, 0, 5);
 camera.target.set(0, -0.5, 0);
 camera.update();
-console.log('camera matrix:', cameraMatrix);
-console.log('view matrix:', viewMatrix);
+console.log('camera matrix:', camera.cameraMatrix);
+console.log('view matrix:', camera.viewMatrix);
 // the view matrix is the inverse of the camera matrix
 // you can pass these into the material.uniforms object.
 ```
