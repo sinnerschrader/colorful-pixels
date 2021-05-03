@@ -21,6 +21,10 @@ This is actually a project by [Lea](https://github.com/terabaud), and she decide
 - One-Liners (`mix`, `clamp`)
 - Basic geometries (plane geometry, box geometry, sphere geometry and a custom geometry)
 
+## API documentation
+
+- https://sinnerschrader.github.io/colorful-pixels/
+
 ## Getting started
 
 - First, add colorful pixels to your project via `npm install colorful-pixels`.

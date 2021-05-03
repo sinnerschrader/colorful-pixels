@@ -24,6 +24,7 @@
     "test": "jest",
     "build:types": "tsc -d --emitDeclarationOnly",
     "build:js": "node build",
+    "build:docs": "npx typedoc src/index.ts && touch docs/.nojekyll",
     "build": "rm -rf dist && npm run build:types -s && npm run build:js -s",
     "prepublishOnly": "npm run lint -s && npm test -s && npm run build"
   },
@@ -46,5 +47,7 @@
     "ts-jest": "^26.5.4",
     "typescript": "^4.2.3"
   },
-  "dependencies": {}
+  "dependencies": {
+    "typedoc": "^0.20.36"
+  }
 }
