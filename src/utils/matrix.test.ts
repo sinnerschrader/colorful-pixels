@@ -1,5 +1,6 @@
 import { Vector } from './vector';
-import { Matrix, Mat4 } from './matrix';
+import { Matrix } from './matrix';
+import * as Mat4 from './mat4';
 
 describe('generic matrix arithmetics', () => {
   test('2x3 matrix initialization', () => {
