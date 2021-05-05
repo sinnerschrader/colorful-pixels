@@ -30,7 +30,7 @@ export function createPlaneGeometry(
     .map((_, i) => {
       const ix = i % cols1;
       const iy = (i / cols1) | 0;
-      return new Vector(ix / cols, iy / rows);
+      return new Vector(ix / cols, 1 - iy / rows);
     });
 
   // array of 3 vertex indexes forming a triangle each
