@@ -14,9 +14,10 @@ describe('Plane geometry tests', () => {
     expect([...geometry.attributes.normal.data]).toEqual([
       0,0,1, 0,0,1, 0,0,1, 0,0,1, 0,0,1, 0,0,1
     ]);
+
     //prettier-ignore
     expect([...geometry.attributes.uv.data]).toEqual([
-      0,0, 1,0, 0,1, 1,0, 1,1, 0,1
+      0,1, 1,1, 0,0, 1,1, 1,0, 0,0
     ]);
   });
 
